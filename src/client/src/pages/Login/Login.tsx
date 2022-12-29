@@ -1,23 +1,37 @@
-import { TextInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import TextInput from '../../components/TextInput/TextInput';
+import { useDebouncedState } from '@mantine/hooks';
+import { useState } from 'react';
+import Button from '../../components/Button/Button';
 
 const Login = () => {
 
-    const form = useForm({
-        initialValues: {
-            username: '',
-        },
-        validate: {
-            username: (value) => value ? null : "Моля въведете потребител"
-        }
-    })
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    const loginSubmitHandler = () => {
+        
+    };
+
     return (
-        <form className="flex items-center justify-center" onSubmit={() => ''}>
+        <form className="flex flex-col justify-center items-center h-screen">
+            <div className="mb-5 text-lg">Вход в системата</div>
             <TextInput
-                withAsterisk
-                label="Потребител"
-                placeholder=""
+                required
+                label='Потребител'
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                placeholder='Въведи потребител..'
+                type='text'
             />
+            <TextInput
+                required
+                label='Парола'
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Въведи парола.."
+                type='password'
+            />
+            <Button onClick={loginSubmitHandler} className="ml-[10rem] mt-2">Вход</Button>
         </form>
     );
 };

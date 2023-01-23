@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import Navigation from "../../components/Navigation/Navigation";
 import TextInput from "../../components/TextInput/TextInput";
 
 const Register = () => {
+
+    const navigate = useNavigate();
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -11,8 +14,24 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const registerSubmitHandler = () => {
+    const registerSubmitHandler = async () => {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                email: email,
+                address: address,
+                password: password,
+                confirmPassword: confirmPassword
+            })
+        });
 
+        if(response.ok) {
+            navigate('/login');
+        }
     };
     return (
         <>

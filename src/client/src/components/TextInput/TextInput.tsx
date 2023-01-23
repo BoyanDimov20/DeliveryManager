@@ -4,11 +4,11 @@ import { useDebouncedValue } from '@mantine/hooks';
 type TextInputProps = {
     label?: string,
     placeholder?: string,
-    value?: string,
+    value?: string | number,
     error?: string,
     required?: boolean,
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void,
-    type: 'text' | 'password' | 'email',
+    type: 'text' | 'password' | 'email' | 'number',
     rows?: boolean
 };
 

@@ -5,8 +5,11 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App'
 import Navigation from './components/Navigation/Navigation';
 import './index.css'
+import CreatePackage from './pages/Create/CreatePackage';
+import EditPackage from './pages/Edit/EditPackage';
 import EditUser from './pages/Edit/EditUser';
-import List from './pages/Lists/List';
+import ListPackages from './pages/Lists/ListPackages';
+import ListUsers from './pages/Lists/ListUsers';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 
@@ -27,12 +30,24 @@ const router = createBrowserRouter([
 		element: <Register />
 	},
 	{
-		path: "/list",
-		element: <List />
+		path: "/users",
+		element: <ListUsers />
 	},
 	{
 		path: '/editUser/:id',
 		element: <EditUser />
+	},
+	{
+		path: '/packages',
+		element: <ListPackages />
+	},
+	{
+		path: '/editPackage/:id',
+		element: <EditPackage />
+	},
+	{
+		path: '/createPackage',
+		element: <CreatePackage />
 	}
 ]);
 

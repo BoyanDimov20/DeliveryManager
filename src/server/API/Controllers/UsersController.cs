@@ -1,20 +1,27 @@
-﻿using API.Models;
+﻿using API.Models.Shared;
+using API.Models.Users;
 using Data.Models;
 using Data.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Services.Contracts;
 
 namespace API.Controllers
 {
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class UsersController : ControllerBase
     {
         private readonly IRepository repository;
+        private readonly IUsersService usersService;
+        private readonly IAuthService authService;
 
-        public UsersController(IRepository repository)
+        public UsersController(IRepository repository, IUsersService usersService, IAuthService authService)
         {
             this.repository = repository;
+            this.usersService = usersService;
+            this.authService = authService;
         }
 
         [HttpGet]
@@ -46,7 +53,7 @@ namespace API.Controllers
                         Key = "username",
                         Value= "Потребител"
                     },
-                   
+
                     new Label
                     {
                         Key = "email",
@@ -73,24 +80,42 @@ namespace API.Controllers
                     }
                 },
                 Data = users
-            }); 
+            });
         }
 
         [HttpGet]
         [Route("api/[controller]/{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            var user = await this.repository.GetById<User>(id).Select(x => new
-            {
-                Id = x.Id,
-                Username = x.UserName,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                HomeAddress = x.HomeAddress,
-                Role = ""
-            }).FirstOrDefaultAsync();
+            var user = await this.repository.GetById<User>(id).FirstOrDefaultAsync();
 
-            return Ok(user);
+
+            return Ok(new
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                HomeAddress = user.HomeAddress,
+                Role = await this.authService.GetRole(user)
+            });
+        }
+
+        [HttpPut]
+        [Route("api/[controller]")]
+        public async Task<IActionResult> Update(UpdateUserModel model)
+        {
+            await this.usersService.UpdateUser(model.Id, model.Name, model.Role, model.Address);
+
+            return Ok();
+        }
+
+        [HttpDelete("/api/[controller]/{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            await this.repository.DeleteById<User>(id);
+
+            return Ok();
         }
     }
 }

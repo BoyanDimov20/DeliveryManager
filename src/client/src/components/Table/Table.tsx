@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { MouseEvent } from 'react'
+import Button from "../Button/Button";
 
 type TableProps = {
     title: string,
@@ -7,17 +8,28 @@ type TableProps = {
         key: string,
         value: string
     }[]
-    data: {}[]
+    data: {}[],
+    updateHandler: (id: string) => void,
+    deleteHandler: (id: string) => void,
+    createHandler?: () => void,
+    createLabel?: string,
+    isEditable: boolean
 };
 
-const Table = ({ title, labels, data }: TableProps) => {
+const Table = ({ title, labels, data, updateHandler, deleteHandler, createHandler, createLabel, isEditable }: TableProps) => {
 
-    const navigate = useNavigate();
 
-    function editUserHandler(event: MouseEvent<HTMLAnchorElement>, userId: string) {
+    function doUpdate(event: MouseEvent<HTMLAnchorElement>, id: string) {
         event.preventDefault();
 
-        navigate('/editUser/' + userId);
+        updateHandler(id);
+    }
+
+
+    function doDelete(event: MouseEvent<HTMLAnchorElement>, id: string) {
+        event.preventDefault();
+
+        deleteHandler(id);
     }
 
     return (
@@ -26,7 +38,10 @@ const Table = ({ title, labels, data }: TableProps) => {
 
             <div className="overflow-x-auto relative shadow-md sm:rounded-lg">
                 <div className="flex justify-between items-center pb-4">
-
+                    {createLabel === undefined ? null
+                        :
+                        <Button onClick={createHandler}>{createLabel}</Button>
+                    }
                     <label htmlFor="table-search" className="sr-only">Search</label>
                     <div className="relative">
                         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
@@ -49,9 +64,13 @@ const Table = ({ title, labels, data }: TableProps) => {
                                     {x.value}
                                 </th>
                             )}
-                            <th scope="col" className="py-3 px-6">
-                                Действия
-                            </th>
+                            {isEditable ?
+                                <th scope="col" className="py-3 px-6">
+                                    Действия
+                                </th>
+                                : null
+                            }
+
                         </tr>
                     </thead>
                     <tbody>
@@ -71,10 +90,13 @@ const Table = ({ title, labels, data }: TableProps) => {
                                     </td>
                                 )}
 
-                                <td className="py-4 px-6">
-                                    <a onClick={(event) => editUserHandler(event, x['id' as keyof typeof x])} href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                                    <a href="#" className="ml-3 font-medium text-blue-600 dark:text-blue-500 hover:underline">Delete</a>
-                                </td>
+                                {isEditable ?
+                                    <td className="py-4 px-6">
+                                        <a onClick={(event) => doUpdate(event, x['id' as keyof typeof x])} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                                        <a onClick={(event) => doDelete(event, x['id' as keyof typeof x])} className="ml-3 font-medium text-blue-600 dark:text-blue-500 hover:underline">Delete</a>
+                                    </td>
+                                    : null
+                                }
                             </tr>
                         )
                         }

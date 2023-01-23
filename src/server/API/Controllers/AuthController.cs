@@ -1,7 +1,8 @@
-﻿using API.Models;
+﻿using API.Models.Auth;
 using Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Services.Contracts;
 
 namespace API.Controllers
 {
@@ -11,11 +12,13 @@ namespace API.Controllers
     {
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
+        private readonly IAuthService authService;
 
-        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, IAuthService authService)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.authService = authService;
         }
 
         [HttpPost]
@@ -56,6 +59,24 @@ namespace API.Controllers
             }
 
             return Ok();
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            await this.signInManager.SignOutAsync();
+
+            return Ok();
+        }
+
+        public async Task<IActionResult> Me()
+        {
+            var user = await this.userManager.GetUserAsync(User);
+            return Ok(new
+            {
+                IsAuthenticated = User.Identity.IsAuthenticated,
+                Username = User.Identity.Name,
+                IsAdmin = this.User.IsInRole("Admin")
+            });
         }
     }
 }

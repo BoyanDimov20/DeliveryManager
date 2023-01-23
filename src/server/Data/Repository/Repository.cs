@@ -1,4 +1,5 @@
 ﻿using Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Data.Repository
@@ -43,10 +44,7 @@ namespace Data.Repository
 
         public async Task DeleteById<T>(string id) where T : class, IEntity, new()
         {
-            var entity = new T
-            {
-                Id = id
-            };
+            var entity = await this.dbContext.Set<T>().Where(x => x.Id == id).FirstOrDefaultAsync();
 
             this.dbContext.Remove(entity);
             await this.dbContext.SaveChangesAsync();

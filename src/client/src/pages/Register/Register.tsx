@@ -36,7 +36,7 @@ const Register = () => {
     return (
         <>
             <Navigation />
-            <form className="flex flex-col justify-center items-center h-screen">
+            <form className="flex flex-col mt-10 items-center h-screen">
                 <div className="mb-5 text-lg">Регистрация в системата</div>
                 <TextInput
                     required

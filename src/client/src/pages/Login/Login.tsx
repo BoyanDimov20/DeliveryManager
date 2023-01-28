@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Button from '../../components/Button/Button';
 import Navigation from '../../components/Navigation/Navigation';
 import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 
 const Login = () => {
@@ -25,11 +26,19 @@ const Login = () => {
             })
         });
 
-        if(response.ok) {
-            navigate('/');
+        if (response.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Успешно!',
+                text: 'Логването успешно.',
+                timer: 1500
+            }).then(() => {
+                navigate('/');
+            });
+
             return;
-        } 
-        
+        }
+
         const error = await response.text();
         setError(error);
     };
@@ -37,7 +46,7 @@ const Login = () => {
     return (
         <>
             <Navigation />
-            <form className="flex flex-col justify-center items-center h-screen">
+            <form className="flex flex-col mt-10 items-center h-screen">
                 <div className="mb-5 text-lg">Вход в системата</div>
                 <TextInput
                     required
@@ -55,7 +64,7 @@ const Login = () => {
                     placeholder="Въведи парола.."
                     type='password'
                 />
-                <div style={{color: 'red'}}>{error}</div>
+                <div style={{ color: 'red' }}>{error}</div>
                 <Button onClick={loginSubmitHandler} className="ml-[10rem] mt-2">Вход</Button>
             </form>
         </>

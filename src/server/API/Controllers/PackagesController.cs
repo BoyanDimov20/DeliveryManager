@@ -112,7 +112,8 @@ namespace API.Controllers
                     SenderUserId = user.Id,
                     SenderName = user.FirstName,
                     Status = Status.Processing,
-                    DeliveryAddress = model.DeliveryAddress
+                    DeliveryAddress = model.DeliveryAddress,
+                    ReceivedAtOfficeId = model.ReceivedAtOfficeId
                 });
             }
             else
@@ -130,7 +131,8 @@ namespace API.Controllers
                     SenderUserId = user.Id,
                     SenderName = user.FirstName,
                     Status = Status.Processing,
-                    DeliveryAddress = office != null ? office.Address : ""
+                    DeliveryAddress = office != null ? office.Address : "",
+                    ReceivedAtOfficeId = model.ReceivedAtOfficeId
                 });
             }
 

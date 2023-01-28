@@ -89,6 +89,14 @@ namespace API.Controllers
         {
             var user = await this.repository.GetById<User>(id).FirstOrDefaultAsync();
 
+            var employeeInfo = await this.repository.GetAll<Employee>()
+                .Where(x => x.UserId == user.Id)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.OfficeId
+                })
+                .FirstOrDefaultAsync();
 
             return Ok(new
             {
@@ -97,7 +105,9 @@ namespace API.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 HomeAddress = user.HomeAddress,
-                Role = await this.authService.GetRole(user)
+                Role = await this.authService.GetRole(user),
+                EmployeeId = employeeInfo.Id,
+                OfficeId = employeeInfo.OfficeId                
             });
         }
 
@@ -105,7 +115,7 @@ namespace API.Controllers
         [Route("api/[controller]")]
         public async Task<IActionResult> Update(UpdateUserModel model)
         {
-            await this.usersService.UpdateUser(model.Id, model.Name, model.Role, model.Address);
+            await this.usersService.UpdateUser(model.Id, model.Name, model.Role, model.Address, model.OfficeId);
 
             return Ok();
         }

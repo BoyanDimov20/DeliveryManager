@@ -13,5 +13,7 @@ namespace API.Models.Packages
         public DeliveryType DeliveryType { get; set; }
 
         public string OfficeId { get; set; }
+
+        public string ReceivedAtOfficeId { get; set; }
     }
 }

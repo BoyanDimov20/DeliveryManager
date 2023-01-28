@@ -6,6 +6,7 @@ import Button from "../../components/Button/Button";
 import Navigation from "../../components/Navigation/Navigation";
 import SelectInput from "../../components/TextInput/SelectInput";
 import TextInput from "../../components/TextInput/TextInput";
+import { useOffices, useOfficesOptions } from "../../services/officeService";
 
 
 const roles = [
@@ -29,6 +30,8 @@ const roles = [
 
 const EditUser = () => {
     const { id } = useParams();
+    const offices = useOfficesOptions();
+
     const saveHandler = async () => {
         const response = await fetch('/api/users', {
             method: 'PUT',
@@ -36,14 +39,15 @@ const EditUser = () => {
                 id: id,
                 name: name,
                 role: Number(role),
-                address: address
+                address: address,
+                officeId
             }),
             headers: {
                 'Content-Type': 'application/json'
             }
         });
 
-        if(response.ok) {
+        if (response.ok) {
             Swal.fire('Запазен!',
                 'Потребителя беше запазен.',
                 'success'
@@ -61,22 +65,34 @@ const EditUser = () => {
     const [name, setName] = useState('');
     const [role, setRole] = useState<string | number>(0);
     const [address, setAddress] = useState('');
+    const [officeId, setOfficeId] = useState('');
+
+    const a = {
+        x: 5,
+        y: ''
+    };
 
     useEffect(() => {
         setName(data?.firstName ?? '');
         setRole(data?.role ?? 0);
         setAddress(data?.homeAddress ?? '');
+        setOfficeId(data?.officeId ?? '');
     }, [data]);
+
 
     return (
         <>
             <Navigation />
-            <form className="flex flex-col justify-center items-center h-screen">
+            <form className="flex flex-col mt-10 items-center h-screen">
                 <div className="mb-5 text-lg">Редакция на потребител</div>
                 <TextInput type="text" label="Потребител" value={data?.username ?? ''} />
                 <TextInput type="text" label="Име" value={name} onChange={(e) => setName(e.target.value)} />
                 <SelectInput label="Роля" options={roles} value={role} onChange={(e) => setRole(e.target.value)} />
                 <TextInput type="text" label="Адрес" value={address} onChange={(e) => setAddress(e.target.value)} />
+                {data?.employeeId ?
+                    <SelectInput label="Работи в офис" options={offices} value={officeId} onChange={(e) => setOfficeId(e.target.value)} />
+                    : <></>
+                }
                 <Button className="ml-[9rem] mt-2" onClick={saveHandler}>Запази</Button>
             </form>
         </>

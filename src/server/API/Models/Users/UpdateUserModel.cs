@@ -11,5 +11,7 @@ namespace API.Models.Users
         public EmployeeRoleModel Role { get; set; }
 
         public string Address { get; set; }
+
+        public string OfficeId { get; set; }
     }
 }

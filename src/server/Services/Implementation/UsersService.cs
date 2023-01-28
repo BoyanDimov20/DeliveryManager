@@ -19,7 +19,7 @@ namespace Services.Implementation
             this.userManager = userManager;
         }
 
-        public async Task UpdateUser(string id, string name, EmployeeRoleModel role, string address)
+        public async Task UpdateUser(string id, string name, EmployeeRoleModel role, string address, string officeId)
         {
             var user = await this.repository.GetById<User>(id).FirstOrDefaultAsync();
 
@@ -34,6 +34,10 @@ namespace Services.Implementation
                     .Where(x => x.UserId == user.Id)
                     .FirstOrDefaultAsync();
 
+                if (employee != null)
+                {
+                    employee.OfficeId = officeId;
+                }
 
                 switch (role)
                 {
@@ -79,6 +83,17 @@ namespace Services.Implementation
                         await this.userManager.AddToRoleAsync(user, "Admin");
                         break;
                     case EmployeeRoleModel.Admin:
+                        if (employee == null)
+                        {
+                            await this.repository.Add(new Employee
+                            {
+                                UserId = user.Id
+                            });
+                        }
+                        else
+                        {
+                            await this.repository.Update(employee);
+                        }
                         await this.userManager.AddToRoleAsync(user, "Admin");
                         break;
                     default:

@@ -60,7 +60,7 @@ const EditPackage = () => {
     return (
         <>
             <Navigation />
-            <form className="flex flex-col justify-center items-center h-screen">
+            <form className="flex flex-col mt-10 items-center h-screen">
                 <div className="mb-5 text-lg">Редакция на пратка</div>
                 <TextInput type="text" label="Име на изпращач" value={senderName} onChange={(e) => setSenderName(e.target.value)} />
                 <TextInput type="text" label="Адрес" value={address} onChange={(e) => setAddress(e.target.value)} />

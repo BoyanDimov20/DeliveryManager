@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App'
 import Navigation from './components/Navigation/Navigation';
 import './index.css'
+import CreateOffice from './pages/Create/CreateOffice';
 import CreatePackage from './pages/Create/CreatePackage';
 import EditPackage from './pages/Edit/EditPackage';
 import EditUser from './pages/Edit/EditUser';
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
 	{
 		path: '/createPackage',
 		element: <CreatePackage />
+	},
+	{
+		path: '/registerOffice',
+		element: <CreateOffice />
 	}
 ]);
 

@@ -4,6 +4,6 @@ namespace Services.Contracts
 {
     public interface IUsersService
     {
-        Task UpdateUser(string id, string name, EmployeeRoleModel role, string address);
+        Task UpdateUser(string id, string name, EmployeeRoleModel role, string address, string officeId);
     }
 }

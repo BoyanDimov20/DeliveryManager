@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { MouseEvent } from 'react'
+import { MouseEvent, useMemo, useState } from 'react'
 import Button from "../Button/Button";
+import Chip from "../Chip/Chip";
 
 type TableProps = {
     title: string,
@@ -13,12 +14,13 @@ type TableProps = {
     deleteHandler: (id: string) => void,
     createHandler?: () => void,
     createLabel?: string,
-    isEditable: boolean
+    isEditable: boolean,
+    Chips?: JSX.Element[]
 };
 
-const Table = ({ title, labels, data, updateHandler, deleteHandler, createHandler, createLabel, isEditable }: TableProps) => {
+const Table = ({ title, labels, data, updateHandler, deleteHandler, createHandler, createLabel, isEditable, Chips }: TableProps) => {
 
-
+    const [filter, setFilter] = useState('');
     function doUpdate(event: MouseEvent<HTMLAnchorElement>, id: string) {
         event.preventDefault();
 
@@ -32,6 +34,26 @@ const Table = ({ title, labels, data, updateHandler, deleteHandler, createHandle
         deleteHandler(id);
     }
 
+    const filteredData = useMemo(() => filterData(filter), [filter]);
+
+    function filterData(filter: string) {
+        const result = [];
+
+        if (filter == '') {
+            return data;
+        }
+
+        for (const obj of data) {
+            for (const key in obj) {
+                if (obj.hasOwnProperty(key) && (obj[key as keyof typeof obj] as string)?.includes(filter)) {
+                    result.push(obj);
+                }
+            }
+        }
+
+        return result;
+    }
+
     return (
         <div className="m-4 ">
             <div className="text-lg mb-4">{title}</div>
@@ -40,14 +62,19 @@ const Table = ({ title, labels, data, updateHandler, deleteHandler, createHandle
                 <div className="flex justify-between items-center pb-4">
                     {createLabel === undefined ? null
                         :
-                        <Button onClick={createHandler}>{createLabel}</Button>
+                        <div className="flex gap-5">
+                            <Button onClick={createHandler}>{createLabel}</Button>
+                            <div className="flex gap-1">{Chips}</div>
+
+                        </div>
                     }
+
                     <label htmlFor="table-search" className="sr-only">Search</label>
                     <div className="relative">
                         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                             <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path></svg>
                         </div>
-                        <input type="text" id="table-search" className="block p-2 pl-10 w-80 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for items" />
+                        <input type="text" id="table-search" className="block p-2 pl-10 w-80 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for items" value={filter} onChange={(e) => setFilter(e.target.value)} />
                     </div>
                 </div>
                 <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -75,7 +102,7 @@ const Table = ({ title, labels, data, updateHandler, deleteHandler, createHandle
                     </thead>
                     <tbody>
 
-                        {data.map((x, i) =>
+                        {filteredData.map((x, i) =>
                             <tr key={i} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                 <td className="p-4 w-4">
                                     <div className="flex items-center">

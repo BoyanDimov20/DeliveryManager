@@ -16,7 +16,7 @@ const Navigation = () => {
         event.preventDefault();
         fetch('/api/auth/logout').then(x => {
             if (x.ok) {
-                queryClient.invalidateQueries(['auth', 'me']);
+                queryClient.invalidateQueries();
                 navigate('/');
             }
         })
@@ -66,7 +66,10 @@ const Navigation = () => {
                         : null
                     }
                     {identity?.isAdmin ?
-                        <Link to="/users" className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white cursor-pointer mr-4">Потребители</Link>
+                        <>
+                            <Link to="/users" className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white cursor-pointer mr-4">Потребители</Link>
+                            <Link to="/registerOffice" className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white cursor-pointer mr-4">Регистриране на офис</Link>
+                        </>
                         : <></>
                     }
 

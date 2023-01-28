@@ -16,7 +16,9 @@ type OfficeProps = {
 
 export const useOffices = () => {
 
-    const { data } = useQuery('offices', getOffices);
+    const { data } = useQuery('offices', getOffices, {
+        staleTime: 60000
+    });
 
 
     return data as OfficeProps[];

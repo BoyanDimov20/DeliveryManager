@@ -34,7 +34,7 @@ const Table = ({ title, labels, data, updateHandler, deleteHandler, createHandle
         deleteHandler(id);
     }
 
-    const filteredData = useMemo(() => filterData(filter), [filter]);
+    const filteredData = useMemo(() => filterData(filter), [data, filter]);
 
     function filterData(filter: string) {
         const result = [];
@@ -42,11 +42,12 @@ const Table = ({ title, labels, data, updateHandler, deleteHandler, createHandle
         if (filter == '') {
             return data;
         }
-
+        
         for (const obj of data) {
             for (const key in obj) {
                 if (obj.hasOwnProperty(key) && (obj[key as keyof typeof obj] as string)?.includes(filter)) {
                     result.push(obj);
+                    break;
                 }
             }
         }

@@ -113,7 +113,8 @@ namespace API.Controllers
                     SenderName = user.FirstName,
                     Status = Status.Processing,
                     DeliveryAddress = model.DeliveryAddress,
-                    ReceivedAtOfficeId = model.ReceivedAtOfficeId
+                    ReceivedAtOfficeId = model.ReceivedAtOfficeId,
+                    Price = CalculatePrice(model.Weight, model.DeliveryType)
                 });
             }
             else
@@ -164,6 +165,27 @@ namespace API.Controllers
             await this.repository.DeleteById<Package>(id);
 
             return this.Ok();
+        }
+
+        private double CalculatePrice(double weight, DeliveryType deliveryType)
+        {
+            double price = weight * 3.5;
+            switch (deliveryType)
+            {
+                case DeliveryType.ToOffice:
+                    price += 2;
+                    break;
+                case DeliveryType.ToAddress:
+                    price += 8;
+                    break;
+                case DeliveryType.ToAddressExpress:
+                    price += 15;
+                    break;
+                default:
+                    break;
+            }
+
+            return price;
         }
     }
 }

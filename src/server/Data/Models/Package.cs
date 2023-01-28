@@ -29,5 +29,6 @@ namespace Data.Models
         public DeliveryType DeliveryType { get; set; }
         public Status Status { get; set; }
 
+        public double? Price { get; set; }
     }
 }

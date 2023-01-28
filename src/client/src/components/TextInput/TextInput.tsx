@@ -24,7 +24,6 @@ const TextInput = (props: TextInputProps) => {
         if (props.onChange)
             props.onChange(event);
 
-        console.log('Changed');
     };
 
     let hasError = props.error || (props.required && isTouched && !props.value);

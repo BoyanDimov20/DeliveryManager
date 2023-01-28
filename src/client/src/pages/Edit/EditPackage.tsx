@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import Button from "../../components/Button/Button";
@@ -12,6 +12,7 @@ import { DeliveryTypesOptions, DeliveryStatusOptions } from "../../enums";
 
 const EditPackage = () => {
     const { id } = useParams();
+    const queryClient = useQueryClient();
     const [senderName, setSenderName] = useState('');
     const [address, setAddress] = useState('');
     const [status, setStatus] = useState(0);
@@ -37,6 +38,7 @@ const EditPackage = () => {
         });
 
         if (response.ok) {
+            queryClient.invalidateQueries('packages');
             Swal.fire('Запазено!',
                 'Пратка беше запазена.',
                 'success'
@@ -67,6 +69,7 @@ const EditPackage = () => {
                 <SelectInput label="Статус" options={DeliveryStatusOptions} value={status} onChange={(e) => setStatus(Number(e.target.value))} />
                 <TextInput type="text" label="Име на получател" value={receiverName} onChange={(e) => setReceiverName(e.target.value)} />
                 <SelectInput label="Вид доставка" options={DeliveryTypesOptions} value={deliveryType} onChange={(e) => setDeliveryType(Number(e.target.value))} />
+                <TextInput type="text" label="Цена" value={(data?.price ?? '0') + ' лв'} />
                 <Button className="ml-[9rem] mt-2" onClick={saveHandler}>Запази</Button>
             </form>
         </>

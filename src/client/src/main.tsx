@@ -9,6 +9,7 @@ import CreateOffice from './pages/Create/CreateOffice';
 import CreatePackage from './pages/Create/CreatePackage';
 import EditPackage from './pages/Edit/EditPackage';
 import EditUser from './pages/Edit/EditUser';
+import ListIncome from './pages/Lists/ListIncome';
 import ListPackages from './pages/Lists/ListPackages';
 import ListUsers from './pages/Lists/ListUsers';
 import Login from './pages/Login/Login';
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
 	{
 		path: '/registerOffice',
 		element: <CreateOffice />
+	},
+	{
+		path: '/listIncome',
+		element: <ListIncome />
 	}
 ]);
 

@@ -1,14 +1,23 @@
 import Navigation from "../../components/Navigation/Navigation";
 import { DatePicker } from "@mui/x-date-pickers";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "../../components/Button/Button";
+import { usePackageHistory } from "../../services/packageService";
+import { useQueryClient } from "react-query";
+import useDebounceState from "../../hooks/useDebounceState";
 
 const ListIncome = () => {
+
+    const queryClient = useQueryClient();
 
     const [startDate, setStartDate] = useState<Date | null>(new Date());
     const [endDate, setEndDate] = useState<Date | null>(new Date());
 
+    const packageHistory = usePackageHistory(startDate, endDate);
+    
+    const totalCount = packageHistory?.map(x => x.notProcessed.count + x.inStorage.count + x.delivered.count).reduce((a, b) => a + b, 0);
+    const totalIncome = packageHistory?.map(x => x.notProcessed.income + x.inStorage.income + x.delivered.income).reduce((a, b) => a + b, 0);
     return (
         <>
             <Navigation />
@@ -19,8 +28,7 @@ const ListIncome = () => {
                     onChange={(newValue) => {
                         setStartDate(newValue);
                     }}
-                    renderInput={(params) => <TextField {...params} />}
-                />
+                    renderInput={(params) => <TextField {...params} />} disableHighlightToday={undefined} showDaysOutsideCurrentMonth={undefined} />
 
                 <DatePicker
                     label="Крайна дата"
@@ -28,10 +36,7 @@ const ListIncome = () => {
                     onChange={(newValue) => {
                         setEndDate(newValue);
                     }}
-                    renderInput={(params) => <TextField {...params} />}
-                />
-                <Button>Покажи</Button>
-
+                    renderInput={(params) => <TextField {...params} />} disableHighlightToday={undefined} showDaysOutsideCurrentMonth={undefined} />
             </div>
 
             <div className="relative overflow-x-auto">
@@ -50,84 +55,53 @@ const ListIncome = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="bg-white border-b border-t">
-                            <td className="px-6 py-2 whitespace-nowrap text-sm font-thin text-gray-900">Лозенец</td>
-                        </tr>
-                        <tr className="bg-white dark:bg-gray-800">
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Необработени
-                            </th>
-                            <td className="px-6 py-4">
-                                1
-                            </td>
-                            <td className="px-6 py-4">
-                                $2999
-                            </td>
-                        </tr>
-                        <tr className="bg-white dark:bg-gray-800">
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                В склад
-                            </th>
-                            <td className="px-6 py-4">
-                                1
-                            </td>
-                            <td className="px-6 py-4">
-                                $1999
-                            </td>
-                        </tr>
-                        <tr className="bg-white dark:bg-gray-800">
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Доставени
-                            </th>
-                            <td className="px-6 py-4">
-                                1
-                            </td>
-                            <td className="px-6 py-4">
-                                $99
-                            </td>
-                        </tr>
-                        <tr className="bg-white border-b border-t">
-                            <td className="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">Левски Г</td>
-                        </tr>
-                        <tr className="bg-white dark:bg-gray-800">
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Необработени
-                            </th>
-                            <td className="px-6 py-4">
-                                1
-                            </td>
-                            <td className="px-6 py-4">
-                                $2999
-                            </td>
-                        </tr>
-                        <tr className="bg-white dark:bg-gray-800">
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                В склад
-                            </th>
-                            <td className="px-6 py-4">
-                                1
-                            </td>
-                            <td className="px-6 py-4">
-                                $1999
-                            </td>
-                        </tr>
-                        <tr className="bg-white dark:bg-gray-800">
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                Доставени
-                            </th>
-                            <td className="px-6 py-4">
-                                1
-                            </td>
-                            <td className="px-6 py-4">
-                                $99
-                            </td>
-                        </tr>
+                        {packageHistory?.map(office =>
+                            <Fragment key={office.officeId}>
+                                <tr className="bg-white border-b border-t mb-10">
+                                    <td className="px-6 py-2 whitespace-nowrap text-sm font-thin text-gray-900">{office.officeName}</td>
+                                </tr>
+                                <tr className="bg-white dark:bg-gray-800">
+                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        Необработени
+                                    </th>
+                                    <td className="px-6 py-4">
+                                        {office.notProcessed.count}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {office.notProcessed.income.toFixed(2)} лв
+                                    </td>
+                                </tr>
+                                <tr className="bg-white dark:bg-gray-800">
+                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        В склад
+                                    </th>
+                                    <td className="px-6 py-4">
+                                        {office.inStorage.count}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {office.inStorage.income.toFixed(2)} лв
+                                    </td>
+                                </tr>
+                                <tr className="bg-white dark:bg-gray-800">
+                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        Доставени
+                                    </th>
+                                    <td className="px-6 py-4">
+                                        {office.delivered.count}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {office.delivered.income.toFixed(2)} лв
+                                    </td>
+                                </tr>
+                            </Fragment>
+                        )}
+
                     </tbody>
                     <tfoot>
                         <tr className="font-semibold text-gray-900 dark:text-white">
-                            <th scope="row" className="px-6 py-3 text-base">Total</th>
-                            <td className="px-6 py-3">3</td>
-                            <td className="px-6 py-3">21,000</td>
+                            <th scope="row" className="px-6 py-3 text-base">Общо</th>
+                            <td className="px-6 py-3">{totalCount ?? '0'}</td>
+                            <td className="px-6 py-3">{totalIncome?.toFixed(2) ?? '0'} лв</td>
                         </tr>
                     </tfoot>
                 </table>

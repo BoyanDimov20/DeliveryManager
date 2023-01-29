@@ -168,8 +168,8 @@ namespace API.Controllers
             return this.Ok();
         }
 
-        [HttpGet("api/[controller]/history")]
-        public async Task<IActionResult> Get([FromBody]PackageHistoryModel model)
+        [HttpPost("api/[controller]/history")]
+        public async Task<IActionResult> GetPackageHistory([FromBody]PackageHistoryModel model)
         {
             var cultureInfo = new CultureInfo("bg-BG");
             

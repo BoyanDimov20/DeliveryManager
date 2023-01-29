@@ -9,12 +9,13 @@ namespace Data.Models
             Id = Guid.NewGuid().ToString();
             CreatedOn = DateTime.Now;
             UpdatedOn = DateTime.Now;
+            
         }
 
         public string Id { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-
+        
         public string SenderName { get; set; }
         public User SenderUser { get; set; }
         public string SenderUserId { get; set; }
@@ -30,5 +31,7 @@ namespace Data.Models
         public Status Status { get; set; }
 
         public double? Price { get; set; }
+
+        public ICollection<PackageHistory> PackageHistory { get; set; }
     }
 }

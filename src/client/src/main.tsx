@@ -14,7 +14,9 @@ import ListPackages from './pages/Lists/ListPackages';
 import ListUsers from './pages/Lists/ListUsers';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
-
+import 'dayjs/locale/bg'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 const queryClient = new QueryClient()
 
@@ -63,8 +65,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<RouterProvider router={router} />
-		</QueryClientProvider>
+		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="bg">
+			<QueryClientProvider client={queryClient}>
+				<RouterProvider router={router} />
+			</QueryClientProvider>
+		</LocalizationProvider>
 	</React.StrictMode>,
 )

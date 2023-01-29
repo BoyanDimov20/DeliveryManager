@@ -13,6 +13,7 @@ namespace Data
         public DbSet<Office> Offices { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Package> Packages { get; set; }
+        public DbSet<PackageHistory> PackageHistory { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -28,6 +29,11 @@ namespace Data
                 .WithOne(x => x.ReceivedAtOffice)
                 .HasForeignKey(x => x.ReceivedAtOfficeId);
 
+            builder.Entity<Office>()
+                .HasMany(x => x.PackagesHistory)
+                .WithOne(x => x.ReceivedAtOffice)
+                .HasForeignKey(x => x.ReceivedAtOfficeId);
+
             builder.Entity<User>()
                 .HasMany(x => x.PackagesSent)
                 .WithOne(x => x.SenderUser)
@@ -37,6 +43,11 @@ namespace Data
                 .HasOne(x => x.Employee)
                 .WithOne(x => x.User)
                 .HasForeignKey<Employee>(x => x.UserId);
+
+            builder.Entity<Package>()
+                .HasMany(x => x.PackageHistory)
+                .WithOne(x => x.Package)
+                .HasForeignKey(x => x.PackageId);
         }
     }
 }

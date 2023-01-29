@@ -19,5 +19,6 @@
 
         public ICollection<Employee> Employees { get; set; }
         public ICollection<Package> PackagesInStorage { get; set; }
+        public ICollection<PackageHistory> PackagesHistory { get; set; }
     }
 }

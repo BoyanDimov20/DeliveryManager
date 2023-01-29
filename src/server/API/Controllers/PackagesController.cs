@@ -1,4 +1,5 @@
-﻿using API.EnumConverters;
+﻿using System.Globalization;
+using API.EnumConverters;
 using API.Models.Packages;
 using API.Models.Shared;
 using API.Models.Users;
@@ -165,6 +166,62 @@ namespace API.Controllers
             await this.repository.DeleteById<Package>(id);
 
             return this.Ok();
+        }
+
+        [HttpGet("api/[controller]/history")]
+        public async Task<IActionResult> Get([FromBody]PackageHistoryModel model)
+        {
+            var cultureInfo = new CultureInfo("bg-BG");
+            
+            var packages = await this.repository.GetAll<PackageHistory>()
+                .Where(x => x.CreatedOn >= DateTime.Parse(model.StartDate, cultureInfo) 
+                            && x.CreatedOn <= DateTime.Parse(model.EndDate, cultureInfo))
+                .Select(x => new PackageHistoryDto
+                {
+                    Id = x.PackageId,
+                    DeliveryType = x.DeliveryType,
+                    Price = x.Price,
+                    Status = x.Status,
+                    ReceivedInOfficeId = x.ReceivedAtOfficeId
+                }).ToListAsync();
+
+            
+            
+            var notProcessed = packages.Where(x => x.Status == Status.Processing);
+            var inStorage = packages.Where(x => x.Status == Status.Sent || x.Status == Status.Waiting);
+            var delivered = packages.Where(x => x.Status == Status.Delivered);
+            
+            var offices = await this.repository.GetAll<Office>().Select(x => new PackageHistoryResult
+            {
+                OfficeId = x.Id,
+                OfficeName = x.Name + $" ({x.Address})"
+            }).ToListAsync();
+
+            foreach (var office in offices)
+            {
+                var notProcessedForOffice = notProcessed.Where(x => x.ReceivedInOfficeId == office.OfficeId);
+                office.NotProcessed = new OfficePackageResult
+                {
+                    Count = notProcessedForOffice.Count(),
+                    Income = notProcessedForOffice.DistinctBy(x => x.Id).Sum(x => x.Price)
+                };
+                
+                var inStorageForOffice = inStorage.Where(x => x.ReceivedInOfficeId == office.OfficeId);
+                office.InStorage = new OfficePackageResult
+                {
+                    Count = inStorageForOffice.Count(),
+                    Income = inStorageForOffice.DistinctBy(x => x.Id).Sum(x => x.Price)
+                };
+                
+                var deliveredForOffice = delivered.Where(x => x.ReceivedInOfficeId == office.OfficeId);
+                office.Delivered = new OfficePackageResult
+                {
+                    Count = deliveredForOffice.Count(),
+                    Income = deliveredForOffice.DistinctBy(x => x.Id).Sum(x => x.Price)
+                };
+            }
+
+            return Ok(offices);
         }
 
         private double CalculatePrice(double weight, DeliveryType deliveryType)

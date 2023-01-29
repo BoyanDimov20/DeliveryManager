@@ -16,7 +16,25 @@ namespace Data.Repository
         public async Task Add(IEntity entity)
         {
             await this.dbContext.AddAsync(entity);
+            
+            if (entity.GetType() == typeof(Package))
+            {
+                var package = (Package)entity;
+                await this.Add(new PackageHistory
+                {
+                    PackageId = package.Id,
+                    Status = package.Status,
+                    DeliveryAddress = package.DeliveryAddress,
+                    Price = package.Price,
+                    Weight = package.Weight,
+                    DeliveryType = package.DeliveryType,
+                    ReceiverName = package.ReceiverName,
+                    ReceivedAtOfficeId = package.ReceivedAtOfficeId
+                });
+            }
+            
             await this.dbContext.SaveChangesAsync();
+            
         }
 
         public async Task Delete(IEntity entity)
@@ -37,8 +55,24 @@ namespace Data.Repository
 
         public async Task Update(IEntity entity)
         {
+            if (entity.GetType() == typeof(Package))
+            {
+                var package = (Package)entity;
+                await this.dbContext.PackageHistory.AddAsync(new PackageHistory
+                {
+                    PackageId = package.Id,
+                    Status = package.Status,
+                    DeliveryAddress = package.DeliveryAddress,
+                    Price = package.Price,
+                    Weight = package.Weight,
+                    DeliveryType = package.DeliveryType,
+                    ReceiverName = package.ReceiverName,
+                    ReceivedAtOfficeId = package.ReceivedAtOfficeId
+                });
+            }
+            
+            entity.UpdatedOn = DateTime.Now;
             this.dbContext.Update(entity);
-
             await this.dbContext.SaveChangesAsync();
         }
 
@@ -46,8 +80,11 @@ namespace Data.Repository
         {
             var entity = await this.dbContext.Set<T>().Where(x => x.Id == id).FirstOrDefaultAsync();
 
-            this.dbContext.Remove(entity);
-            await this.dbContext.SaveChangesAsync();
+            if (entity != null)
+            {
+                this.dbContext.Remove(entity);
+                await this.dbContext.SaveChangesAsync();
+            }
         }
 
         public async Task Delete<T>(Expression<Func<T, bool>> predicate) where T : class, IEntity

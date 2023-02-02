@@ -174,8 +174,8 @@ namespace API.Controllers
             var cultureInfo = new CultureInfo("bg-BG");
             
             var packages = await this.repository.GetAll<PackageHistory>()
-                .Where(x => x.CreatedOn >= DateTime.Parse(model.StartDate, cultureInfo) 
-                            && x.CreatedOn <= DateTime.Parse(model.EndDate, cultureInfo))
+                .Where(x => x.CreatedOn.Ticks >= DateTime.Parse(model.StartDate, cultureInfo).Ticks
+                            && x.CreatedOn.Ticks <= DateTime.Parse(model.EndDate, cultureInfo).Ticks)
                 .Select(x => new PackageHistoryDto
                 {
                     Id = x.PackageId,

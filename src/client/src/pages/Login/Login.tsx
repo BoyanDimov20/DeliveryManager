@@ -5,6 +5,7 @@ import Button from '../../components/Button/Button';
 import Navigation from '../../components/Navigation/Navigation';
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
+import { useQueryClient } from 'react-query';
 
 
 const Login = () => {
@@ -13,6 +14,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const loginSubmitHandler = async () => {
         const response = await fetch('/api/auth/login', {
@@ -33,6 +35,7 @@ const Login = () => {
                 text: 'Логването успешно.',
                 timer: 1500
             }).then(() => {
+                queryClient.invalidateQueries();
                 navigate('/');
             });
 

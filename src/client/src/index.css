@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.transition-height {
+    animation: slidedown 1s;
+}
+@keyframes slidedown {
+    from {
+        transform: translateX(-100px);
+        width: 0%;
+    }
+    to {
+        transform: translateX(0px);
+        width: 100%;
+    }
+}
+.transition-height > div * {
+    animation: slideside 1s ease;
+}
+
+@keyframes slideside {
+    from {
+        transform: translateX(-100px);
+    }
+    to {
+        transform: translateX(0px);
+    }
+}
+
+.slide-side {
+    animation: slideside 1s ease;
+}

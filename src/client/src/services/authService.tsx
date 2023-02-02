@@ -13,8 +13,9 @@ export const useIdentity = () => {
 }
 
 
-async function getClaims() {
+function getClaims() {
 
-    const response = await fetch('/api/auth/me');
-    return await response.json();
+    return fetch('/api/auth/me')
+            .then(x => x.json())
+            .catch(() => {});
 }

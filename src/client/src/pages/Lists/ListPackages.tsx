@@ -15,10 +15,12 @@ const ListPackages = () => {
     const queryClient = useQueryClient();
     const identity = useIdentity();
 
-    async function getPackages() {
-        const response = await fetch('/api/packages');
+    function getPackages() {
 
-        return await response.json();
+        return fetch('/api/packages')
+            .then(x => x.json())
+            .catch(() => {});
+
     }
 
     function editPackage(packageId: string) {
@@ -68,14 +70,14 @@ const ListPackages = () => {
             <Chip key="Получена" label="Получена" value="Получена" onClick={(isEnabled) => clickFilter(isEnabled, "Получена")} />
         ],
         filterFunction: (data: any) => {
-            return data.filter((x: any) => filter.some(y => x['status' as keyof typeof x] == y) || filter.length == 0);
+            return data?.filter((x: any) => filter.some(y => x['status' as keyof typeof x] == y) || filter.length == 0);
         }
     }
 
     return (
         <>
             <Navigation />
-            {isLoading ? null : <Table Chips={filters.chips} isEditable={identity?.isAdmin} createLabel="Създай пратка" createHandler={createPackage} title="Списък с пратки" labels={data.labels} data={filters.filterFunction(data.data)} updateHandler={editPackage} deleteHandler={deletePackage} />}
+            {isLoading ? null : <Table Chips={filters.chips} isEditable={identity?.isAdmin} createLabel="Създай пратка" createHandler={createPackage} title="Списък с пратки" labels={data?.labels} data={filters.filterFunction(data?.data)} updateHandler={editPackage} deleteHandler={deletePackage} />}
         </>
     );
 };

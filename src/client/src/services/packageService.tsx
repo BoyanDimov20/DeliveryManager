@@ -19,12 +19,12 @@ type PackageHistoryProps = {
 }
 
 
-const getPackageHistory = async (startDate: Date | null, endDate: Date | null) => {
+const getPackageHistory = (startDate: Date | null, endDate: Date | null) => {
 
     const startDateStr = dayjs(startDate).format("DD.MM.YYYY").toString();
     const endDateStr = dayjs(endDate).format("DD.MM.YYYY").toString();
 
-    const response = await fetch('/api/packages/history', {
+    return fetch('/api/packages/history', {
         method: 'POST',
         body: JSON.stringify({
             startDate: startDateStr,
@@ -33,9 +33,9 @@ const getPackageHistory = async (startDate: Date | null, endDate: Date | null) =
         headers: {
             'Content-Type': 'application/json'
         }
-    });
+    }).then(x => x.json())
+        .catch(() => { });
 
-    return await response.json();
 };
 
 

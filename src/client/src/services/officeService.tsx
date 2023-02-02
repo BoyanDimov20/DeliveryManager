@@ -1,11 +1,12 @@
 import { useQuery } from "react-query";
 
 
-async function getOffices() {
+function getOffices() {
 
-    const response = await fetch('/api/office');
+    return fetch('/api/office')
+        .then(x => x.json())
+        .catch(() => { });
 
-    return await response.json();
 }
 
 type OfficeProps = {

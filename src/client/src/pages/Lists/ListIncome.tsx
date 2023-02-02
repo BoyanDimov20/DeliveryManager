@@ -5,17 +5,25 @@ import TextField from "@mui/material/TextField";
 import Button from "../../components/Button/Button";
 import { usePackageHistory } from "../../services/packageService";
 import { useQueryClient } from "react-query";
-import useDebounceState from "../../hooks/useDebounceState";
+import dayjs from "dayjs";
 
 const ListIncome = () => {
 
     const queryClient = useQueryClient();
 
-    const [startDate, setStartDate] = useState<Date | null>(new Date());
-    const [endDate, setEndDate] = useState<Date | null>(new Date());
+    const [startDate, setStartDate] = useState<Date | null>(() => {
+        const date = dayjs();
+        return date.startOf('month').toDate();
+    });
+
+    const [endDate, setEndDate] = useState<Date | null>(() => {
+        const currentDate = dayjs();
+        const nextMonth = currentDate.add(1, 'month').startOf('month');
+        return nextMonth.toDate();
+    });
 
     const packageHistory = usePackageHistory(startDate, endDate);
-    
+
     const totalCount = packageHistory?.map(x => x.notProcessed.count + x.inStorage.count + x.delivered.count).reduce((a, b) => a + b, 0);
     const totalIncome = packageHistory?.map(x => x.notProcessed.income + x.inStorage.income + x.delivered.income).reduce((a, b) => a + b, 0);
     return (
@@ -39,7 +47,7 @@ const ListIncome = () => {
                     renderInput={(params) => <TextField {...params} />} disableHighlightToday={undefined} showDaysOutsideCurrentMonth={undefined} />
             </div>
 
-            <div className="relative overflow-x-auto">
+            <div className="relative overflow-x-auto p-3">
                 <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
@@ -98,7 +106,7 @@ const ListIncome = () => {
 
                     </tbody>
                     <tfoot>
-                        <tr className="font-semibold text-gray-900 dark:text-white">
+                        <tr className="font-semibold text-gray-900 dark:text-white border-t-2">
                             <th scope="row" className="px-6 py-3 text-base">Общо</th>
                             <td className="px-6 py-3">{totalCount ?? '0'}</td>
                             <td className="px-6 py-3">{totalIncome?.toFixed(2) ?? '0'} лв</td>

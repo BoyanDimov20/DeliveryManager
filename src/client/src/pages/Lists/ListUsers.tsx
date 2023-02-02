@@ -10,9 +10,10 @@ const ListUsers = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    async function getUsers() {
-        const response = await fetch('/api/users');
-        return await response.json();
+    function getUsers() {
+        return fetch('/api/users')
+            .then(x => x.json())
+            .catch(() => { });
     }
 
     function editUser(userId: string) {
@@ -38,7 +39,7 @@ const ListUsers = () => {
     return (
         <>
             <Navigation />
-            {isLoading ? null : <Table isEditable={true} title="Списък с пoтребители" labels={data.labels} data={data.data} updateHandler={editUser} deleteHandler={deleteUser} />}
+            {isLoading ? null : <Table isEditable={true} title="Списък с пoтребители" labels={data?.labels} data={data?.data} updateHandler={editUser} deleteHandler={deleteUser} />}
         </>
     );
 };

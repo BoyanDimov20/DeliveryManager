@@ -38,6 +38,7 @@ const EditUser = () => {
             body: JSON.stringify({
                 id: id,
                 name: name,
+                lastName: family,
                 role: Number(role),
                 address: address,
                 officeId
@@ -63,6 +64,7 @@ const EditUser = () => {
     }
 
     const [name, setName] = useState('');
+    const [family, setFamily] = useState('');
     const [role, setRole] = useState<string | number>(0);
     const [address, setAddress] = useState('');
     const [officeId, setOfficeId] = useState('');
@@ -74,6 +76,7 @@ const EditUser = () => {
 
     useEffect(() => {
         setName(data?.firstName ?? '');
+        setFamily(data?.lastName ?? '');
         setRole(data?.role ?? 0);
         setAddress(data?.homeAddress ?? '');
         setOfficeId(data?.officeId ?? '');
@@ -87,6 +90,7 @@ const EditUser = () => {
                 <div className="mb-5 text-lg">Редакция на потребител</div>
                 <TextInput type="text" label="Потребител" value={data?.username ?? ''} />
                 <TextInput type="text" label="Име" value={name} onChange={(e) => setName(e.target.value)} />
+                <TextInput type="text" label="Фамилия" value={family} onChange={(e) => setFamily(e.target.value)} />
                 <SelectInput label="Роля" options={roles} value={role} onChange={(e) => setRole(e.target.value)} />
                 <TextInput type="text" label="Адрес" value={address} onChange={(e) => setAddress(e.target.value)} />
                 {data?.employeeId ?

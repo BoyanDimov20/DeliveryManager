@@ -3,7 +3,9 @@ import { useQuery } from "react-query"
 type IdentityClaims = {
     isAuthenticated: boolean | undefined,
     username: string | undefined,
-    isAdmin: boolean
+    isAdmin: boolean,
+    hasAtLeastOnePackage: boolean,
+    hasAtLeastOnePackageProcessed: boolean
 }
 
 export const useIdentity = () => {

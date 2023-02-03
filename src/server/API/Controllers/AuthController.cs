@@ -1,5 +1,6 @@
 ﻿using API.Models.Auth;
 using Data.Models;
+using Data.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
@@ -13,17 +14,24 @@ namespace API.Controllers
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
         private readonly IAuthService authService;
+        private readonly IRepository repository;
 
-        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, IAuthService authService)
+        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, IAuthService authService, IRepository repository)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.authService = authService;
+            this.repository = repository;
         }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterInputModel inputModel)
         {
+            if (inputModel.Password != inputModel.ConfirmPassword)
+            {
+                return BadRequest("Паролите не съвпадат");
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(this.ModelState.FirstOrDefault().Value?.Errors.FirstOrDefault()?.ErrorMessage);
@@ -34,6 +42,8 @@ namespace API.Controllers
                 UserName = inputModel.Username,
                 Email = inputModel.Email,
                 HomeAddress = inputModel.Address,
+                FirstName = inputModel.FirstName,
+                LastName = inputModel.LastName,
             }, inputModel.Password);
 
             if (!result.Succeeded)
@@ -75,7 +85,9 @@ namespace API.Controllers
             {
                 IsAuthenticated = User.Identity.IsAuthenticated,
                 Username = User.Identity.Name,
-                IsAdmin = this.User.IsInRole("Admin")
+                IsAdmin = this.User.IsInRole("Admin"),
+                HasAtLeastOnePackage = user != null && this.repository.GetAll<Package>().Where(x => x.SenderUserId == user.Id).Count() > 0,
+                HasAtLeastOnePackageProcessed = user != null && this.repository.GetAll<Package>().Where(x => x.SenderUserId == user.Id && x.Status != Data.Enums.Status.Processing).Count() > 0
             });
         }
     }

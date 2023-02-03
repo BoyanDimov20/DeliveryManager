@@ -19,7 +19,7 @@ namespace Services.Implementation
             this.userManager = userManager;
         }
 
-        public async Task UpdateUser(string id, string name, EmployeeRoleModel role, string address, string officeId)
+        public async Task UpdateUser(string id, string name, string lastName, EmployeeRoleModel role, string address, string officeId)
         {
             var user = await this.repository.GetById<User>(id).FirstOrDefaultAsync();
 
@@ -27,6 +27,7 @@ namespace Services.Implementation
             {
                 user.FirstName = name;
                 user.HomeAddress = address;
+                user.LastName = lastName;
 
                 await this.repository.Update(user);
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import Button from "../../components/Button/Button";
 import Navigation from "../../components/Navigation/Navigation";
 import TextInput from "../../components/TextInput/TextInput";
@@ -10,6 +11,8 @@ const Register = () => {
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [address, setAddress] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -23,14 +26,34 @@ const Register = () => {
             body: JSON.stringify({
                 username: username,
                 email: email,
+                firstName,
+                lastName,
                 address: address,
                 password: password,
                 confirmPassword: confirmPassword
             })
         });
 
-        if(response.ok) {
-            navigate('/login');
+        if (response.ok) {
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Успешно!',
+                text: 'Регистрацията беше успешна.',
+                timer: 1000
+            }).then(() => {
+                if (!window.localStorage.getItem('registered'))
+                    window.localStorage.setItem('registered', 'true');
+                navigate('/login');
+            });
+        } else {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Грешка!',
+                text: await response.text(),
+                timer: 2000
+            });
         }
     };
     return (
@@ -54,6 +77,16 @@ const Register = () => {
                     placeholder='Example@gmail.com'
                     type='email'
                 />
+                <TextInput type="text"
+                    label="Име"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Въведи име.." />
+                <TextInput type="text"
+                    label="Фамилия"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Въведи фамилия" />
                 <TextInput
                     required
                     label='Адрес'

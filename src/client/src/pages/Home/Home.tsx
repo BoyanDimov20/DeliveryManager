@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import homeImg from '../../assets/home-img.png';
 import homeImg2 from '../../assets/home-img2.png';
 import { useEffect, useState, useTransition } from "react";
+import useHomeProgress from "../../hooks/useHomeProgress";
 
 
 const steps = ['Select campaign settings', 'Create an ad group', 'Create an ad'];
@@ -16,13 +17,16 @@ const steps = ['Select campaign settings', 'Create an ad group', 'Create an ad']
 const Home = () => {
 
     const [progress, setProgress] = useState(1);
+
     useEffect(() => {
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 4; i++) {
             setTimeout(() => {
                 setProgress(i);
             }, 1000 * i);            
         }
     }, []);
+
+    const completedTasks = useHomeProgress();
 
     return (
         <>
@@ -35,17 +39,22 @@ const Home = () => {
                     </h2>
                     <Stepper orientation="vertical" className="bg-white">
                         {progress >= 1 &&
-                            <Step completed={true} className="slide-side">
+                            <Step completed={completedTasks > 0} active={completedTasks == 0} className="slide-side">
                                 <StepLabel>Направете си регистрация</StepLabel>
                             </Step>
                         }
                         {progress >= 2 &&
-                            < Step completed={false} active={true} className="slide-side">
+                            <Step completed={completedTasks > 1} active={completedTasks == 1} className="slide-side">
+                                <StepLabel>Влезте във вашия профил</StepLabel>
+                            </Step>
+                        }
+                        {progress >= 3 &&
+                            < Step completed={completedTasks > 2} active={completedTasks == 2} className="slide-side">
                                 <StepLabel>Изпратете вашата първа пратка</StepLabel>
                             </Step>
                         }
-                        {progress == 3 &&
-                            <Step completed={false} className="slide-side">
+                        {progress == 4 &&
+                            <Step completed={completedTasks > 3} active={completedTasks == 3} className="slide-side">
                                 <StepLabel>Изчакайте одобрение :)</StepLabel>
                             </Step>
                         }

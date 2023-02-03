@@ -8,6 +8,8 @@ namespace API.Models.Users
 
         public string Name { get; set; }
 
+        public string LastName { get; set; }
+
         public EmployeeRoleModel Role { get; set; }
 
         public string Address { get; set; }

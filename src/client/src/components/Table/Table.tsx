@@ -45,7 +45,7 @@ const Table = ({ title, labels, data, updateHandler, deleteHandler, createHandle
         
         for (const obj of data) {
             for (const key in obj) {
-                if (obj.hasOwnProperty(key) && (obj[key as keyof typeof obj] as string)?.includes(filter)) {
+                if (obj.hasOwnProperty(key) && String(obj[key as keyof typeof obj])?.includes(filter)) {
                     result.push(obj);
                     break;
                 }

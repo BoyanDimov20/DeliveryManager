@@ -106,8 +106,8 @@ namespace API.Controllers
                 LastName = user.LastName,
                 HomeAddress = user.HomeAddress,
                 Role = await this.authService.GetRole(user),
-                EmployeeId = employeeInfo.Id,
-                OfficeId = employeeInfo.OfficeId                
+                EmployeeId = employeeInfo?.Id,
+                OfficeId = employeeInfo?.OfficeId                
             });
         }
 
@@ -115,7 +115,7 @@ namespace API.Controllers
         [Route("api/[controller]")]
         public async Task<IActionResult> Update(UpdateUserModel model)
         {
-            await this.usersService.UpdateUser(model.Id, model.Name, model.Role, model.Address, model.OfficeId);
+            await this.usersService.UpdateUser(model.Id, model.Name, model.LastName, model.Role, model.Address, model.OfficeId);
 
             return Ok();
         }
@@ -127,5 +127,6 @@ namespace API.Controllers
 
             return Ok();
         }
+
     }
 }

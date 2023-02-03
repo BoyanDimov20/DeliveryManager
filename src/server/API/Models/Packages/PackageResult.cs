@@ -15,5 +15,7 @@ namespace API.Models.Packages
         public string Status { get; set; }
 
         public string DeliveryAddress { get; set; }
+
+        public double? Price { get; set; }
     }
 }

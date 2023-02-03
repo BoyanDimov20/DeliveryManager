@@ -33,6 +33,7 @@ namespace API.Controllers
 
             var packages = await this.repository.GetAll<Package>()
                 .Where(x => x.SenderUserId == userId || User.IsInRole("Admin"))
+                .OrderByDescending(x => x.UpdatedOn)
                 .Select(x => new PackageResult
                 {
                     Id = x.Id,
@@ -40,7 +41,8 @@ namespace API.Controllers
                     ReceiverName = x.ReceiverName,
                     DeliveryType = EnumConverter.GetDeliveryTypeName(x.DeliveryType),
                     Status = EnumConverter.GetPackageStatusName(x.Status),
-                    DeliveryAddress = x.DeliveryAddress
+                    DeliveryAddress = x.DeliveryAddress,
+                    Price = x.Price
 
                 }).ToArrayAsync();
 
@@ -83,6 +85,7 @@ namespace API.Controllers
         }
 
         [HttpGet("api/[controller]/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Get(string id)
         {
 
@@ -103,46 +106,37 @@ namespace API.Controllers
         public async Task<IActionResult> Post(CreatePackage model)
         {
             var user = await this.userManager.GetUserAsync(User);
-            if (model.DeliveryType != DeliveryType.ToOffice)
+            var package = new Package
             {
-                await this.repository.Add(new Package
-                {
-                    ReceiverName = model.ReceiverName,
-                    DeliveryType = model.DeliveryType,
-                    Weight = model.Weight,
-                    SenderUserId = user.Id,
-                    SenderName = user.FirstName,
-                    Status = Status.Processing,
-                    DeliveryAddress = model.DeliveryAddress,
-                    ReceivedAtOfficeId = model.ReceivedAtOfficeId,
-                    Price = CalculatePrice(model.Weight, model.DeliveryType)
-                });
-            }
-            else
+                ReceiverName = model.ReceiverName,
+                DeliveryType = model.DeliveryType,
+                Weight = model.Weight,
+                SenderUserId = user.Id,
+                SenderName = user.FirstName,
+                Status = Status.Processing,
+                DeliveryAddress = model.DeliveryAddress,
+                ReceivedAtOfficeId = model.ReceivedAtOfficeId,
+                Price = CalculatePrice(model.Weight, model.DeliveryType)
+            };
+
+            if (model.DeliveryType == DeliveryType.ToOffice)
             {
                 var office = await this.repository.GetById<Office>(model.OfficeId).Select(x => new
                 {
                     x.Address
                 }).FirstOrDefaultAsync();
 
-                await this.repository.Add(new Package
-                {
-                    ReceiverName = model.ReceiverName,
-                    DeliveryType = model.DeliveryType,
-                    Weight = model.Weight,
-                    SenderUserId = user.Id,
-                    SenderName = user.FirstName,
-                    Status = Status.Processing,
-                    DeliveryAddress = office != null ? office.Address : "",
-                    ReceivedAtOfficeId = model.ReceivedAtOfficeId
-                });
+                package.DeliveryAddress = office?.Address;
             }
+
+            await this.repository.Add(package);
 
 
             return Ok();
         }
 
         [HttpPut("api/[controller]")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(UpdatePackageModel model)
         {
             var package = await this.repository.GetById<Package>(model.Id).FirstOrDefaultAsync();
@@ -161,6 +155,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("api/[controller]/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             await this.repository.DeleteById<Package>(id);
@@ -169,6 +164,7 @@ namespace API.Controllers
         }
 
         [HttpPost("api/[controller]/history")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetPackageHistory([FromBody]PackageHistoryModel model)
         {
             var cultureInfo = new CultureInfo("bg-BG");

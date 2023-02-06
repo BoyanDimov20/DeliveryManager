@@ -12,6 +12,8 @@ const useHomeProgress = () => {
 
         if (isRegistered == 'true') {
             setProgress(1);
+        } else {
+            setProgress(0);
         }
     }, [identity]);
 

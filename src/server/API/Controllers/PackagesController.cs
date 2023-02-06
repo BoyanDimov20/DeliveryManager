@@ -195,26 +195,27 @@ namespace API.Controllers
 
             foreach (var office in offices)
             {
-                var notProcessedForOffice = notProcessed.Where(x => x.ReceivedInOfficeId == office.OfficeId);
-                office.NotProcessed = new OfficePackageResult
+                var deliveredForOffice = delivered.Where(x => x.ReceivedInOfficeId == office.OfficeId);
+                office.Delivered = new OfficePackageResult
                 {
-                    Count = notProcessedForOffice.Count(),
-                    Income = notProcessedForOffice.DistinctBy(x => x.Id).Sum(x => x.Price)
+                    Count = deliveredForOffice.Count(),
+                    Income = deliveredForOffice.Sum(x => x.Price)
                 };
                 
                 var inStorageForOffice = inStorage.Where(x => x.ReceivedInOfficeId == office.OfficeId);
                 office.InStorage = new OfficePackageResult
                 {
                     Count = inStorageForOffice.Count(),
-                    Income = inStorageForOffice.DistinctBy(x => x.Id).Sum(x => x.Price)
+                    Income = inStorageForOffice.Where(x => !delivered.Any(y => y.Id == x.Id)).Sum(x => x.Price)
                 };
                 
-                var deliveredForOffice = delivered.Where(x => x.ReceivedInOfficeId == office.OfficeId);
-                office.Delivered = new OfficePackageResult
+                var notProcessedForOffice = notProcessed.Where(x => x.ReceivedInOfficeId == office.OfficeId);
+                office.NotProcessed = new OfficePackageResult
                 {
-                    Count = deliveredForOffice.Count(),
-                    Income = deliveredForOffice.DistinctBy(x => x.Id).Sum(x => x.Price)
+                    Count = notProcessedForOffice.Count(),
+                    Income = notProcessedForOffice.Where(x => !inStorage.Any(y => y.Id == x.Id)).Sum(x => x.Price)
                 };
+               
             }
 
             return Ok(offices);
